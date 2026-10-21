@@ -1,0 +1,107 @@
+% MAS1004 Assignment 2: long report.
+%
+% You fill this in with your agent, in your repository. AGENTS.md tells the
+% agent how. Red text in the PDF is what still has to be replaced.
+%
+% - Pictures go in figures/. Copy them from results/, which is not in git.
+% - Outputs go in outputs/: copy experiments.csv, LOG.md and the outputs of
+%   check_submission.py and curate.py count here. \outputfile{outputs/...}
+%   prints a file exactly as it is. Every number in this report has to come
+%   from such an output.
+%
+% To make the PDF: compress this folder into a zip, and on Overleaf choose
+% New Project, Upload Project. Set Menu, Compiler to XeLaTeX, and Recompile.
+
+\documentclass[11pt]{article}
+\usepackage{mas1004}
+
+\reporttitle{Assignment 2: Long report}
+\studentname{Your name}
+\studentid{Your student ID}
+
+\begin{document}
+\makeheader
+
+\fillin{Your leaderboard nickname, and the tags of your last Track A and Track B releases.}
+
+% ---------------------------------------------------------------------------
+\section*{Problem 1. Looking at the problem yourself}
+
+\fillin{Your score on the 40 photos in class, and the clues you used most.}
+
+\fillin{Which of those clues a model can see in a 224 by 224 version of the
+photo, and which it cannot.}
+
+% ---------------------------------------------------------------------------
+\section*{Problem 2. The baseline}
+
+\fillin{The validation score of the starter recipe with seeds 0 and 1.}
+
+\picturefile{figures/mistakes_busan_00.png}
+
+\fillin{What the baseline gets wrong. Use one or more sheets from curate.py
+mistakes.}
+
+% ---------------------------------------------------------------------------
+\section*{Problem 3. Track A}
+
+\begin{center}\footnotesize
+\begin{tabular}{lp{0.42\linewidth}rrr}
+\toprule
+tag & what changed from the run before & seed 0 & seed 1 & mean \\
+\midrule
+\multicolumn{5}{l}{\fillin{one row per recipe, with the numbers from experiments.csv}} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\fillin{For each change: why you tried it, and what you think the result means.}
+
+\fillin{Your final recipe and selection, and their leaderboard score next to
+their validation score.}
+
+% ---------------------------------------------------------------------------
+\section*{Problem 4. Your judgement in the loop}
+
+\fillin{What you looked at, and what you saw in common.}
+
+\fillin{The rule you wrote before acting.}
+
+\fillin{What you changed: the output of curate.py count, or the photos you
+added.}
+
+\fillin{The scores before and after.}
+
+\fillin{The exact requests you gave your agent in this problem.}
+
+% ---------------------------------------------------------------------------
+\section*{Problem 5. Track B}
+
+\fillin{What you added, one step at a time, and the validation score after
+each step.}
+
+\fillin{Where your extra photos came from, and how you know each one's city.
+Summarise data\_sources.csv: how many photos from each source.}
+
+\fillin{Your validation score next to your leaderboard score, and why they
+might disagree.}
+
+\subsection*{Your submission, as the grader sees it}
+\outputfile{outputs/check_submission.txt}
+
+% ---------------------------------------------------------------------------
+\section*{Problem 6. What made the difference}
+
+\fillin{Which change helped most and which least, in both tracks, with your
+numbers.}
+
+\fillin{What you would do next with one more week.}
+
+% ---------------------------------------------------------------------------
+\section*{All runs}
+\outputfile{outputs/experiments.csv}
+
+\section*{Lab notebook}
+\outputfile{outputs/LOG.md}
+
+\end{document}
