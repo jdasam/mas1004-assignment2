@@ -228,9 +228,8 @@ uv run python src/gps_sort.py <folder of photos>
   0.44 billion at 320 and 0.85 at 448; EfficientNet-B0 4.0 million, 0.78
   billion at 320; RegNetY-1.6GF 10.3 million, 1.61 billion at 224. ResNet34
   does not fit. `train_b.py` prints both numbers after training.
-- Starting weights: ImageNet-1k only. torchvision's `IMAGENET1K_V1` and
-  `IMAGENET1K_V2` are fine; timm models only with `.in1k` weights. Write the
-  weights in `submission.json`.
+- Starting weights: any, for example torchvision's `IMAGENET1K_V1` and
+  `IMAGENET1K_V2`. Write the weights in `submission.json`.
 - Extra photos go in `data/mine/<city>/` (or other folders of `<city>/`).
   `gps_sort.py` does this for phone photos. Never commit photos; `data/` is
   in `.gitignore`.

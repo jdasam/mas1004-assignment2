@@ -141,8 +141,8 @@ your own computer.
   the grader does.
 - You choose the image size, from 96 to 512. A smaller network can look at a
   bigger image: MobileNetV3-Large at 448 by 448 uses 0.9 billion.
-- Starting weights trained on ImageNet-1k only, such as torchvision's
-  `IMAGENET1K_V1` and `IMAGENET1K_V2`. Or no starting weights at all.
+- Any starting weights, for example torchvision's `IMAGENET1K_V1` and
+  `IMAGENET1K_V2`, or none at all.
 - If you take frames from YouTube videos: the frames of one video look
   almost the same, so keep all frames of a channel on one side, all in
   training or all in the photos you validate on.

@@ -3,8 +3,7 @@
 Change anything in this file, or replace it. In Track B only the submission
 counts: submission/model.onnx and submission/submission.json, checked by
 src/check_submission.py. What must stay true is in README.md: at most 12
-million parameters and 2.0 billion multiply-adds per photo, and starting
-weights trained on ImageNet-1k only.
+million parameters and 2.0 billion multiply-adds per photo.
 
     python src/train_b.py --tag b1                                  ResNet18 on the starter photos
     python src/train_b.py --tag b2 --folders data/starter/train data/mine
@@ -40,8 +39,8 @@ import rules  # noqa: E402
 from export import export_onnx  # noqa: E402
 from rules import CITIES, MEAN, STD  # noqa: E402
 
-# ImageNet-1k weights from torchvision. Others are allowed if they were
-# trained on ImageNet-1k only; say which in submission.json.
+# ImageNet-1k weights from torchvision. Other starting weights work too; say
+# which in submission.json.
 MODELS = {
     "resnet18": ("resnet18", "IMAGENET1K_V1"),
     "mobilenet_v3_large": ("mobilenet_v3_large", "IMAGENET1K_V2"),
