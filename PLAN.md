@@ -31,10 +31,16 @@ and the agent told you how long one full training takes on your computer and
 gave you a link that opens your notebook on Colab. Keep the link. You filled
 in the registration form on Cyber Campus.
 
-## Step 1. Guess the cities yourself
+## Step 1. Look at the photos yourself
 
-Not a coding step. In class we guess the city of 40 validation photos
-together (README, Problem 1). Write down your score and the clues you used.
+Not a coding step, and up to you.
+
+```
+Show me the training photos of Busan.
+```
+
+Look at a few sheets of each city and write down in `LOG.md` what tells the
+cities apart.
 
 ## Step 2. Train the starter recipe twice
 
@@ -77,25 +83,25 @@ leaderboard.
 
 ## Step 5. The mid-point check (30 October, 22:00)
 
-Make one change of your own choosing (Step 6 says how), so that `LOG.md`
-has at least three runs. End `LOG.md` with a short plan: what your model gets
-wrong, what you will try next, and where you will find more photos for Track B.
+Make one change of your own choosing if you like (Step 6 says how). End
+`LOG.md` with a short plan: what your model gets wrong, what you will try
+next, and where you will find more photos for Track B.
 
-Check: the three items under Problem 2 in README.md.
+Check: the items under "By the mid-point check" in README.md.
 
-## Step 6. One change at a time (Problem 3)
+## Step 6. One change at a time
 
-Choose a change. README, Problem 3, lists some directions; you can also ask
-the agent what a change would do before you decide. Then ask for it as in the
-example at the top. Before it trains, the agent shows you what it changed.
+Choose a change. README, "Ways to go about it", lists some directions; you
+can also ask the agent what a change would do before you decide. Then ask for
+it as in the example at the top. Before it trains, the agent shows you what it changed.
 
 Check, for every change:
 - the change is exactly the one you asked for, and nothing else changed
 - an entry in `LOG.md` with the score and your reason
 
-Do this at least four times, and keep what helps.
+Do this as many times as you want, and keep what helps.
 
-## Step 7. Your judgement in the loop (Problem 4)
+## Step 7. Your judgement in the loop
 
 Do this step yourself. The agent runs the tools and makes the changes you ask
 for; it does not choose photos.
@@ -128,7 +134,7 @@ Then release it, as in Step 4, as `track-b-1`.
 Check: `check_submission.py` printed "format and limits: OK", and you have
 its score on the validation photos.
 
-## Step 9. Track B, better (Problem 5)
+## Step 9. Track B, better
 
 One change at a time, as in Step 6: a different model or image size, the
 changes that helped in Track A, more photos. For your own phone photos:
@@ -149,9 +155,9 @@ they do.
 
 ## Step 11. The long report
 
-Go through the "Write this down" boxes in README.md in order, with your agent.
-It fills in `long_report/long_report.tex` from `experiments.csv`, `LOG.md` and
-the saved output of your runs.
+Write it with your agent. It fills in `long_report/long_report.tex` from
+`experiments.csv`, `LOG.md` and the saved output of your runs. README, "The
+long report", says what a reader should be able to see in it.
 
 Check: no red text is left in the PDF, and every number in it is one that
 code printed.

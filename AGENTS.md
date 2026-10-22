@@ -94,9 +94,9 @@ Track B, whose runs take longer than Track A runs.
 Do not decide these for the student. Do the work around them once the student
 has decided.
 
-- Problem 1: their own guesses and the clues they used.
-- Problem 4: what they see in the photos, the rule, and which photos to drop
-  or collect. Run `curate.py` and show the student the sheets. Do not suggest
+- What tells the cities apart, in their own words.
+- Decisions from looking at photos: what they see, the rule, and which
+  photos to drop or collect. Run `curate.py` and show the student the sheets. Do not suggest
   which photos to drop or what the photos have in common; drop exactly the
   photos the student names, with the student's reason.
 - Which change to try next is the student's choice. Answer when they ask for

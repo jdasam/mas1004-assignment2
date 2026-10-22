@@ -52,6 +52,14 @@ On Cyber Campus (LMS), by the deadline:
 3. The short report as a PDF: one page, written by you.
 4. The long report as a PDF: written with your agent.
 
+By the mid-point check (Friday 30 October, 22:00):
+
+- your nickname and repository are registered, and you have made a Track A
+  release (it appears on the leaderboard the next morning)
+- `LOG.md` has your runs so far and ends with a short plan: what your model
+  gets wrong, what you will try next, and where you will find more photos for
+  Track B
+
 ## Getting started
 
 You need VS Code with Cline, as in Assignment 1, and your GitHub account. In
@@ -205,39 +213,33 @@ gh release create track-b-2 submission/model.onnx submission/submission.json --t
 
 ---
 
-## Problem 1. Look at the problem yourself
+## Ways to go about it
 
-Before any training, find out how you would do it. In class we guess the city
-of 40 validation photos together. For each one, write down what you used:
-the writing on signs, which side of the road cars drive on, road markings,
-scooters, power lines, buildings, plants.
+Nothing in this section is required. It is one way to work through the
+assignment, with ideas to start from: take what is useful and go your own
+way. `PLAN.md` turns it into steps for your agent.
 
-Write this down:
-- Your score on the 40 photos, and the clues you used most.
-- Which of those clues you think a model can see in a 224 by 224 version of
-  the photo, and which it cannot.
+### Look at the photos yourself
 
-## Problem 2. The baseline, released (the mid-point check)
+Before any training, look at photos of each city yourself
+(`curate.py look busan`) and notice what tells the cities apart: the writing
+on signs, which side of the road cars drive on, road markings, scooters,
+power lines, buildings, plants. Which of these can a model still see in a
+224 by 224 version of the photo?
+
+### Start from the starter recipe
 
 Train the starter recipe with `official.py` twice, with seeds 0 and 1, and
-release it as `track-a-1`. The seed sets the random choices in training, such
-as the order of the photos, and it is the only thing you change between the
-two runs. Their scores still differ, and a change that moves the score by
-less than this difference may be luck. Look at the mistakes with
+release it. The seed sets the random choices in training, such as the order
+of the photos, and it is the only thing you change between the two runs.
+Their scores still differ, and a change that moves the score by less than
+this difference may be luck. Look at the mistakes with
 `src/curate.py mistakes`.
 
-By the mid-point check (30 October, 22:00):
-- your nickname and repository are registered, and you have made a Track A
-  release (it appears on the leaderboard the next morning)
-- `LOG.md` has a line for each of at least three runs of `official.py`
-- `LOG.md` ends with a short plan: what your model gets wrong, what you will
-  try next, and where you will find more photos for Track B
+### Track A: better choices with the same photos and budget
 
-## Problem 3. Track A: better choices with the same photos and budget
-
-Make at least four changes to your recipe or selection, one at a time, each
-measured against the run before it, and keep what helps. Some directions, not a
-list to work through:
+Change one thing at a time, measure it against the run before, and keep what
+helps. Some directions, not a list to work through:
 
 - Busan has fewer than half as many training photos as Tokyo. What does the
   model do about that, and what can you do?
@@ -249,33 +251,18 @@ list to work through:
 - The budget is fixed. Is it better spent on all photos once or on fewer
   photos several times? On a bigger batch or more steps?
 
-Write this down:
-- A table of your runs: what changed, and the validation score.
-- For each change: why you tried it, and what you think the result means.
+### Your own judgement in the loop
 
-## Problem 4. Your judgement in the loop
+Look at your model's most confident mistakes (`curate.py mistakes`) or at the
+training photos it doubts most (`curate.py suspects`), and see what they have
+in common. Decide what to do and write the rule down before you act, for
+example "drop training photos taken indoors" or "collect 100 more photos of
+residential streets in Busan". Then do it (`curate.py drop` takes photos out
+of your selection and records your reason), and measure the score before and
+after. You make these decisions, not your agent; your agent makes the changes
+you ask for.
 
-At least once, look at photos yourself, make a decision, and measure it.
-
-1. Look at your model's most confident mistakes (`curate.py mistakes`) or at
-   the training photos it doubts most (`curate.py suspects`). Write down what
-   you see in common.
-2. Decide what to do and write the rule down before you act. For example:
-   "drop training photos taken indoors", or "collect 100 more photos of
-   residential streets in Busan".
-3. Do it. `curate.py drop` takes photos out of your selection and records your
-   reason. For new photos, see Problem 5.
-4. Measure the score before and after.
-
-You make the decisions in this problem, not your agent. Your agent makes the
-changes you ask for.
-
-Write this down:
-- What you looked at, what you saw, the rule you wrote, what you changed, and
-  the scores before and after.
-- The exact requests you gave your agent in this problem.
-
-## Problem 5. Track B: anything that fits
+### Track B: anything that fits
 
 Start from `src/train_b.py` or from anything else. Things people do:
 
@@ -284,19 +271,6 @@ Start from `src/train_b.py` or from anything else. Things people do:
   and saves copies without the location data.
 - a different small model, or a bigger image size for a smaller model
 - everything that worked in Track A
-
-Write this down:
-- What you added, one step at a time, and the score after each step.
-- How you collected your extra photos.
-- Your validation score next to your leaderboard score. If they disagree,
-  why might that be?
-
-## Problem 6. What made the difference
-
-Write this down:
-- Of everything you tried in both tracks, which change helped most, and
-  which helped least? Use your numbers.
-- What would you do next with one more week?
 
 ---
 
@@ -309,19 +283,29 @@ template is in `short_report/`.
 
 ## The long report
 
-Written with your agent, from `long_report/long_report.tex`. It holds what
-the "Write this down" boxes ask for, the run table from `experiments.csv`,
-and your `LOG.md`. Every number in it has to come from output of code you ran.
+Written with your agent, from `long_report/long_report.tex`. Its sections
+are a suggestion; arrange it as you like. A reader should be able to see:
+
+- what you tried in each track, why, and what you think each result means,
+  with the run table from `experiments.csv`
+- the decisions you made yourself from looking at photos, what they changed,
+  and the requests you gave your agent for them
+- how you collected any extra photos
+- your validation scores next to your leaderboard scores, and why they might
+  disagree
+- which change helped most, and what you would do next with one more week
+
+Your `LOG.md` goes at the end. Every number in the report has to come from
+output of code you ran.
 
 ## How this is graded
 
-There are no points attached to the problems. These are looked at:
+No particular path is required. These are looked at:
 
 - the mid-point check
-- Problems 3 and 5: whether each change was measured fairly, and what you
-  concluded
-- Problem 4: whether the decision came from photos you looked at, and
-  whether you measured its effect
+- whether each change you made was measured fairly, and what you concluded
+- whether some of your decisions came from photos you looked at yourself,
+  and whether you measured their effect
 - the leaderboard: valid releases in both tracks at the deadline, and whether
   they beat the starter recipe (Track A) and the starter model (Track B). The
   ranking itself counts only a little.
