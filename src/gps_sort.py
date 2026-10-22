@@ -12,7 +12,9 @@ data used), and saves a copy in data/mine/<city>/. The copy is turned upright
 and has no EXIF data left in it: no place, no time, no phone model. Your
 originals are not changed.
 
-A copy is named after the folder and the original file. Photos without GPS,
+A copy is named after the folder and the original file, with a short code
+for the original's place on your computer, so that two photos never get the
+same name and running this again replaces the same copies. Photos without GPS,
 or taken outside the five cities, are listed at the end and not copied. If
 you know where photos without GPS were taken, run again with --city.
 
@@ -21,6 +23,7 @@ Formats is set to Most Compatible; ask your agent to convert HEIC first.
 """
 
 import argparse
+import hashlib
 import json
 import re
 from pathlib import Path
@@ -79,7 +82,7 @@ def gps_of(image):
 
 
 def slug(text):
-    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:30] or "photo"
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")[:40] or "photo"
 
 
 def main():
@@ -115,7 +118,8 @@ def main():
             if city is None:
                 outside.append(path.name)
                 continue
-        dest = out / city / f"{slug(folder.name)}_{slug(path.stem)}.jpg"
+        code = hashlib.sha1(str(path.resolve()).encode()).hexdigest()[:6]
+        dest = out / city / f"{slug(folder.name)}_{slug(path.stem)}_{code}.jpg"
         dest.parent.mkdir(parents=True, exist_ok=True)
         upright.save(dest, "JPEG", quality=92)  # no exif= argument: the copy has no EXIF data
         copied[city] += 1

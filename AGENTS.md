@@ -49,7 +49,7 @@ checks first, so the setup can be started again after VS Code is reopened.
 ```
 git remote add template https://github.com/jdasam/mas1004-assignment2.git
 git fetch template
-git checkout template/main -- README.md PLAN.md AGENTS.md CLAUDE.md .gitignore .python-version pyproject.toml uv.lock requirements.txt assignment2_colab.ipynb src/rules.py src/official.py src/export.py src/check_submission.py src/curate.py src/gps_sort.py src/get_data.py src/colab.py src/cities.geojson short_report long_report/mas1004.sty
+git checkout template/main -- README.md PLAN.md AGENTS.md CLAUDE.md .gitignore .python-version pyproject.toml uv.lock requirements.txt assignment2_colab.ipynb src/rules.py src/official.py src/export.py src/check_submission.py src/curate.py src/gps_sort.py src/get_data.py src/colab.py src/cities.geojson short_report/mas1004.sty long_report/mas1004.sty
 uv run python src/colab.py link
 git add assignment2_colab.ipynb
 git commit -m "Update the given files"
@@ -159,7 +159,8 @@ The usual changes in `recipe.py`:
   ```
 - No left-right flips: delete `T.RandomHorizontalFlip()` from
   `train_transform`.
-- Other augmentation: `train_transform` gets one PIL image and must return a
+- Other augmentation: `train_transform()` takes no argument and returns a
+  function (for example a `T.Compose`) that gets one PIL image and returns a
   224 x 224 PIL image or a float tensor (3, 224, 224) with values 0 to 1. Do
   not normalise; official.py does. Transforms that need a tensor, such as
   `T.RandomErasing`, go after `T.ToTensor()`.
@@ -197,20 +198,22 @@ commit the script with the file, and print the counts with
 
 ```
 uv run python src/curate.py count
-uv run python src/curate.py look busan
+uv run python src/curate.py look busan --every 20
 uv run python src/curate.py mistakes results/balanced_seed0/model.onnx
 uv run python src/curate.py suspects results/balanced_seed0/model.onnx --every 2
 uv run python src/curate.py drop look_busan_03 5 17 40 --reason "inside a shop"
 uv run python src/curate.py undrop busan/commons_104708282.jpg
 ```
 
-Sheets go to `results/curate/<name>_NN.png`, each with a `.csv` of the
-numbers and paths on it. Open the PNG for the student to look at.
-`mistakes` and `suspects` run the model on the CPU and take a few minutes;
-`--every 4` uses every fourth photo. After training on Colab, run them on
-Colab too (the models stay there), with `--every 4` for `suspects`: Colab has
-two CPU cores, and `suspects` on every training photo takes almost half an
-hour there. Open the sheets that come back.
+Sheets go to `results/curate/<name>_NN.png`, each with a `.csv` of the numbers
+and paths on it. Open the PNG for the student to look at. `look` without
+`--every` draws every selected photo of the city (Tokyo is about 280 sheets);
+`--every 20` gives a few sheets for a first look. `mistakes` and `suspects`
+run the model on the CPU and take a few minutes; `--every 4` uses every fourth
+photo. After training on Colab, run them on Colab too (the models stay there),
+with `--every 4` for `suspects`: Colab has two CPU cores, and `suspects` on
+every training photo takes almost half an hour there. Open the sheets that
+come back.
 
 ## Track B
 

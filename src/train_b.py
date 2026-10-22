@@ -120,6 +120,13 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
     rows = [r for folder in args.folders for r in rules.list_photos(folder)]
+    for folder in map(Path, args.folders):
+        if not folder.is_dir():
+            print(f"{folder} does not exist; nothing from it is used")
+            continue
+        for d in sorted(folder.iterdir()):
+            if d.is_dir() and d.name.lower() not in CITIES:
+                print(f"{d} is not one of the five cities ({', '.join(CITIES)}); its photos are not used")
     counts = {c: sum(1 for _, x in rows if x == c) for c in CITIES}
     print(f"{len(rows)} photos ({', '.join(f'{c} {n}' for c, n in counts.items())}) on {device}")
 
@@ -177,7 +184,7 @@ def main():
     fields = ["finished", "track", "tag", "seed", "official_budget", "budget", "val_score", *CITIES,
               "train_seconds", "device", "selection", "recipe_sha", "selection_sha", "commit"]
     new = not log.exists()
-    with open(log, "a", newline="") as f:
+    with open(log, "a", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=fields)
         if new:
             w.writeheader()

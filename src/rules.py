@@ -73,12 +73,14 @@ def grader_input(image, size):
 
 
 def list_photos(folder):
-    """(path, city) for every photo in folder/<city>/, sorted, in CITIES order."""
+    """(path, city) for every photo in folder/<city>/, sorted, in CITIES order.
+    The city folders may be written in any case (Seoul or seoul)."""
     folder = Path(folder)
+    dirs = {d.name.lower(): d for d in folder.iterdir() if d.is_dir()} if folder.is_dir() else {}
     rows = []
     for city in CITIES:
-        city_dir = folder / city
-        if not city_dir.is_dir():
+        city_dir = dirs.get(city)
+        if city_dir is None:
             continue
         for path in sorted(city_dir.iterdir()):
             if path.suffix.lower() in IMAGE_SUFFIXES:
@@ -139,6 +141,7 @@ CHEAP_OPS = {
     "Reshape", "Flatten", "Squeeze", "Unsqueeze", "Transpose", "Concat",
     "Split", "Slice", "Gather", "GatherElements", "GatherND", "Expand", "Tile",
     "Pad", "Resize", "DepthToSpace", "SpaceToDepth", "Trilu", "OneHot",
+    "ScatterND", "ScatterElements", "NonZero", "TopK", "LRN",
     # 8-bit numbers
     "QuantizeLinear", "DequantizeLinear", "DynamicQuantizeLinear",
 }

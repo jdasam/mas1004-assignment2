@@ -34,7 +34,6 @@ import json
 import os
 import re
 import shlex
-import shutil
 import subprocess
 import sys
 import zipfile
@@ -99,9 +98,13 @@ def queued():
 
 
 def run_key(line, words):
-    """Changes when the line, the recipe, the selection or the script changes."""
+    """Changes when the line, the recipe, the selection or the script changes,
+    and for check_submission.py also when the submission changes."""
     h = hashlib.sha256(line.encode())
-    for path in ("track_a/recipe.py", "track_a/selection.csv", words[1]):
+    paths = ["track_a/recipe.py", "track_a/selection.csv", words[1]]
+    if Path(words[1]).name == "check_submission.py":
+        paths += ["submission/model.onnx", "submission/submission.json"]
+    for path in paths:
         p = ROOT / path
         h.update(p.read_bytes() if p.is_file() else b"-")
     return h.hexdigest()[:16]

@@ -126,7 +126,7 @@ def read_selection(data_dir, recipe_dir):
     if not selection.exists():
         return [(p, c) for p, c in rules.list_photos(train_dir)], "all training photos"
     rows = []
-    with open(selection, newline="", encoding="utf-8") as f:
+    with open(selection, newline="", encoding="utf-8-sig") as f:
         for i, row in enumerate(csv.DictReader(f), start=2):
             rel = (row.get("path") or "").strip().replace("\\", "/")
             city = rel.split("/")[0]
@@ -371,7 +371,7 @@ def main():
         fields = ["finished", "track", "tag", "seed", "official_budget", "budget", "val_score", *CITIES,
                   "train_seconds", "device", "selection", "recipe_sha", "selection_sha", "commit"]
         new = not log.exists()
-        with open(log, "a", newline="") as f:
+        with open(log, "a", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=fields, extrasaction="ignore")
             if new:
                 w.writeheader()

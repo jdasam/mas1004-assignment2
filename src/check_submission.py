@@ -111,10 +111,11 @@ def main():
     if not onnx_path.exists():
         raise SystemExit(f"{onnx_path} is missing.")
 
-    m, more = check_model(onnx_path, size, track)
-    problems += more
-    print(f"{onnx_path}: {m['file_mb']:.1f} MB, {m['parameters'] / 1e6:.2f} million parameters, "
-          f"{m['gmacs']:.2f} billion multiply-adds per {size} x {size} photo")
+    if isinstance(size, int):
+        m, more = check_model(onnx_path, size, track)
+        problems += more
+        print(f"{onnx_path}: {m['file_mb']:.1f} MB, {m['parameters'] / 1e6:.2f} million parameters, "
+              f"{m['gmacs']:.2f} billion multiply-adds per {size} x {size} photo")
     if track == "B":
         print(f"  limits: {rules.TRACK_B_MAX_PARAMETERS / 1e6:.0f} million parameters, "
               f"{rules.TRACK_B_MAX_GMACS} billion multiply-adds")

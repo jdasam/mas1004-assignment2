@@ -26,7 +26,7 @@ of it.
 
 Give Cline the request under "Getting started" in README.md.
 
-Check: the agent ran `official.py --quick`, it ended with "validation score",
+Check: the agent ran `official.py --quick`, it printed a validation score,
 and the agent told you how long one full training takes on your computer and
 gave you a link that opens your notebook on Colab. Keep the link. You filled
 in the registration form on Cyber Campus.
@@ -36,7 +36,7 @@ in the registration form on Cyber Campus.
 Not a coding step, and up to you.
 
 ```
-Show me the training photos of Busan.
+Show me some training photos of Busan.
 ```
 
 Look at a few sheets of each city and write down in `LOG.md` what tells the
@@ -93,7 +93,8 @@ Check: the items under "By the mid-point check" in README.md.
 
 Choose a change. README, "Ways to go about it", lists some directions; you
 can also ask the agent what a change would do before you decide. Then ask for
-it as in the example at the top. Before it trains, the agent shows you what it changed.
+it as in the example at the top. Before it trains, the agent shows you what
+it changed.
 
 Check, for every change:
 - the change is exactly the one you asked for, and nothing else changed
@@ -109,7 +110,7 @@ for; it does not choose photos.
 1. Look at the mistakes (Step 3) or at the training photos the model doubts
    most:
    ```
-   Show me the suspects of balanced.
+   Show me the suspects of my latest Track A run.
    ```
 2. Write down, before you change anything, what you see and the rule you
    will follow. For example: "drop training photos taken indoors".
@@ -132,15 +133,17 @@ Train train_b.py as it is and make it my Track B submission.
 Then release it, as in Step 4, as `track-b-1`.
 
 Check: `check_submission.py` printed "format and limits: OK", and you have
-its score on the validation photos.
+the validation score (`train_b.py` prints it).
 
 ## Step 9. Track B, better
 
 One change at a time, as in Step 6: a different model or image size, the
-changes that helped in Track A, more photos. For your own phone photos:
+changes that helped in Track A, more photos. For your own phone photos,
+copy them from your phone into a folder and name that folder in the request,
+for example:
 
 ```
-Sort the photos in <the folder> into the cities with gps_sort.py.
+Sort the photos in Downloads/busan_trip into the cities with gps_sort.py.
 ```
 
 Check: the model still passes `check_submission.py`, and `LOG.md` has an

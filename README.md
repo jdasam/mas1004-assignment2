@@ -221,11 +221,11 @@ way. `PLAN.md` turns it into steps for your agent.
 
 ### Look at the photos yourself
 
-Before any training, look at photos of each city yourself
-(`curate.py look busan`) and notice what tells the cities apart: the writing
-on signs, which side of the road cars drive on, road markings, scooters,
-power lines, buildings, plants. Which of these can a model still see in a
-224 by 224 version of the photo?
+Before any training, look at photos of each city yourself (ask your agent:
+"Show me some training photos of Busan.") and notice what tells the cities
+apart: the writing on signs, which side of the road cars drive on, road
+markings, scooters, power lines, buildings, plants. Which of these can a model
+still see in a 224 by 224 version of the photo?
 
 ### Start from the starter recipe
 
@@ -306,6 +306,7 @@ No particular path is required. These are looked at:
 - whether each change you made was measured fairly, and what you concluded
 - whether some of your decisions came from photos you looked at yourself,
   and whether you measured their effect
+- the long report: whether a reader can follow what you did and why
 - the leaderboard: valid releases in both tracks at the deadline, and whether
   they beat the starter recipe (Track A) and the starter model (Track B). The
   ranking itself counts only a little.

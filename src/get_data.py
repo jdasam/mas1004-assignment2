@@ -33,7 +33,6 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-# Filled in when the data is published (see planning/assignment2-city-classifier-design.md).
 SHA256 = "b9e8f5748604b972f5c4a234855d1b2fcfaa77daebc903320acbc7c0b9ca363e"
 LINK_FILE = ROOT / "data" / "starter_link.txt"
 EXPECTED = {"train": 44257, "val": 12077}
@@ -117,6 +116,7 @@ def main():
         download(file_id, zip_path)
         digest = sha256_of(zip_path)
         if SHA256 and digest != SHA256:
+            zip_path.unlink()
             sys.exit(f"The download is damaged (sha256 {digest[:12]}...). Run this again.")
     if (data / "starter").is_dir() and not (data / "starter").is_symlink():
         shutil.rmtree(data / "starter")

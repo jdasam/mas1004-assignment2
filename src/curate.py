@@ -5,6 +5,7 @@ you look at them and decide. For Track A, your decisions change
 track_a/selection.csv, the list of training photos official.py uses.
 
     python src/curate.py look busan                   every selected Busan photo, 48 per sheet
+    python src/curate.py look busan --every 20        every 20th one: a few sheets for a first look
     python src/curate.py mistakes results/baseline_seed0/model.onnx
                                                       validation photos the model got wrong most confidently
     python src/curate.py suspects results/baseline_seed0/model.onnx
@@ -56,7 +57,7 @@ def read_selection():
     """Paths relative to the training folder, in order, as selection.csv lists them."""
     if not SELECTION.exists():
         return [f"{c}/{p.name}" for p, c in rules.list_photos(TRAIN)]
-    with open(SELECTION, newline="", encoding="utf-8") as f:
+    with open(SELECTION, newline="", encoding="utf-8-sig") as f:
         return [r["path"] for r in csv.DictReader(f)]
 
 
@@ -124,7 +125,7 @@ def predict(onnx_path, paths, size=rules.TRACK_A_IMAGE_SIZE, batch=32):
 
 
 def cmd_look(args):
-    paths = [p for p in read_selection() if p.split("/")[0] == args.city]
+    paths = [p for p in read_selection() if p.split("/")[0] == args.city][::args.every]
     names = draw_sheets(f"look_{args.city}", [(TRAIN / p, p.split("/")[1][:34]) for p in paths])
     print(f"{len(paths)} selected {args.city} photos on {len(names)} sheets in {OUT}: "
           f"{names[0]} to {names[-1]}" if names else f"no selected {args.city} photos")
@@ -144,7 +145,7 @@ def cmd_mistakes(args):
 
 def cmd_suspects(args):
     paths = read_selection()[::args.every]
-    probs = predict(args.onnx, [TRAIN / p for p in paths])
+    probs = predict(args.onnx, [TRAIN / p for p in paths], args.size)
     OUT.mkdir(parents=True, exist_ok=True)
     with open(OUT / "suspects.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
@@ -178,7 +179,8 @@ def cmd_drop(args):
     unknown = [p for p in paths if p not in set(selection)]
     if unknown:
         raise SystemExit(f"not in the selection: {', '.join(unknown[:5])}")
-    write_selection([p for p in selection if p not in chosen])
+    kept = [p for p in selection if p not in chosen]
+    write_selection(kept)
     new = not DROPPED.exists()
     with open(DROPPED, "a", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
@@ -186,7 +188,7 @@ def cmd_drop(args):
             w.writerow(["path", "reason", "when"])
         for p in paths:
             w.writerow([p, args.reason, datetime.now().isoformat(timespec="seconds")])
-    print(f"dropped {len(paths)} photos ({args.reason}); the selection now has {len(selection) - len(chosen)}")
+    print(f"dropped {len(paths)} photos ({args.reason}); the selection now has {len(kept)}")
 
 
 def cmd_undrop(args):
@@ -234,14 +236,15 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     p = sub.add_parser("look")
     p.add_argument("city", choices=CITIES)
+    p.add_argument("--every", type=int, default=1, help="use every n-th photo only")
     for name in ("mistakes", "suspects"):
         p = sub.add_parser(name)
         p.add_argument("onnx")
         p.add_argument("--n", type=int, default=48, help="photos per city")
         p.add_argument("--every", type=int, default=1, help="use every n-th photo only")
+        p.add_argument("--size", type=int, default=rules.TRACK_A_IMAGE_SIZE, help="the model's image size")
         if name == "mistakes":
             p.add_argument("--photos", default=str(ROOT / "data" / "starter" / "val"))
-            p.add_argument("--size", type=int, default=rules.TRACK_A_IMAGE_SIZE, help="the model's image size")
     p = sub.add_parser("drop")
     p.add_argument("targets", nargs="+", help="a sheet name and numbers on it, or training paths")
     p.add_argument("--reason", required=True)
