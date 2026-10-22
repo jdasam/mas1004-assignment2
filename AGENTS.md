@@ -112,8 +112,8 @@ has decided.
 ## Track A
 
 ```
-uv run python src/official.py --tag balanced --seed 0
-uv run python src/official.py --tag balanced --seed 1
+uv run python src/official.py --tag balanced
+uv run python src/official.py --tag baseline --seed 1
 uv run python src/official.py --quick
 ```
 
@@ -122,7 +122,9 @@ uv run python src/official.py --quick
   `results/<tag>_seed<seed>/model.onnx` and adds a row to `experiments.csv`
   with the validation score. Never change `official.py`, `rules.py`,
   `export.py` or `check_submission.py`.
-- Compare recipes with at least two seeds each, and the same seeds (0 and 1).
+- Train each recipe once, with seed 0 (the default). Only the starter recipe
+  (tag baseline) is trained with seeds 0 and 1, to show the student how much
+  the score moves by chance. Train another seed only when the student asks.
 - `recipe.py` must keep all its functions and their arguments. It may import
   only torch (not torch.hub, torch.utils, torch.jit, torch.onnx and a few
   others), torchvision.transforms, numpy, math, random, PIL, functools,
@@ -143,9 +145,9 @@ uv run python src/official.py --quick
    for a different recipe.
 4. Commit the change, with the tag in the message, before training, so that
    the commit in `experiments.csv` is the recipe that was trained.
-5. Train seeds 0 and 1, here or on Colab.
-6. Add an entry to `LOG.md` in the form at the top of that file: the two
-   scores and their mean, and the student's reason for the change.
+5. Train it, here or on Colab.
+6. Add an entry to `LOG.md` in the form at the top of that file: the score,
+   and the student's reason for the change.
 
 The usual changes in `recipe.py`:
 
@@ -206,7 +208,9 @@ Sheets go to `results/curate/<name>_NN.png`, each with a `.csv` of the
 numbers and paths on it. Open the PNG for the student to look at.
 `mistakes` and `suspects` run the model on the CPU and take a few minutes;
 `--every 4` uses every fourth photo. After training on Colab, run them on
-Colab too (the models stay there), and open the sheets that come back.
+Colab too (the models stay there), with `--every 4` for `suspects`: Colab has
+two CPU cores, and `suspects` on every training photo takes almost half an
+hour there. Open the sheets that come back.
 
 ## Track B
 
@@ -221,8 +225,9 @@ uv run python src/gps_sort.py <folder of photos>
   counts is `submission/model.onnx` and `submission/submission.json`.
 - `check_submission.py` checks the format and the limits (12 million
   parameters, 2.0 billion multiply-adds at the chosen size) exactly as the
-  grader does, then scores the model on `data/starter/val` and
-  `data/sample_target`. It must print "format and limits: OK".
+  grader does, then scores the model on `data/starter/val` and on
+  `data/sample_target` (those photos come later). It must print "format and
+  limits: OK".
 - Some sizes, measured: ResNet18 at 224 has 11.2 million parameters and 1.81
   billion multiply-adds (288 is over the limit); MobileNetV3-Large 4.2 million,
   0.44 billion at 320 and 0.85 at 448; EfficientNet-B0 4.0 million, 0.78
@@ -247,19 +252,24 @@ and bring the results back.
    `python src/`, as you would run them here without `uv run`. Replace what
    was in the file before. For example:
    ```
-   python src/official.py --tag balanced --seed 0
-   python src/official.py --tag balanced --seed 1
+   python src/official.py --tag balanced
    python src/curate.py mistakes results/balanced_seed0/model.onnx --every 2
    ```
    For Track B, add `--submit` to the training line and then
-   `python src/check_submission.py`: only `submission/` comes back from Colab,
-   not the models in `results/`.
+   `python src/check_submission.py --no-val`: only `submission/` comes back
+   from Colab, not the models in `results/`. `--no-val` skips scoring the
+   validation photos again on Colab's two CPU cores (6 minutes);
+   `train_b.py` has printed that score already.
 2. Commit and push `colab_runs.txt` with the code it needs.
 3. Tell the student: open the Colab link from the setup, choose Runtime, Run
    all, and tell you when `from_colab.zip` has downloaded. One Track A run
-   takes about 5 minutes there, plus about 3 minutes to start. The first time,
-   Colab asks to connect Google Drive and for the link to the starter photos.
-   If the link is lost, `uv run python src/colab.py link` prints it again.
+   takes about 6 minutes there, plus 5 to 10 minutes to start; a 6-epoch
+   MobileNetV3-Large run of `train_b.py` at 320 takes about 40 minutes. In
+   every new session Colab warns that the notebook was not written by Google
+   (the student chooses "Run anyway") and asks to connect Google Drive (the
+   student allows everything it asks for). The first time, the notebook also
+   asks for the link to the starter photos. If the Colab link is lost,
+   `uv run python src/colab.py link` prints it again.
 4. When the student says it has downloaded:
    `uv run python src/colab.py take`. It finds the newest `from_colab*.zip`
    in the Downloads folder (or give it the path), adds the new rows to
@@ -267,10 +277,14 @@ and bring the results back.
    every run (`results/colab_logs/`). Then continue with step 6 of "Making a
    change".
 
-A line that already ran on Colab with the same recipe, selection and script
-is skipped, so a session that broke off carries on where it stopped. If a run
-failed, the reason is at the end of its file in `results/colab_logs/`; fix
-it, push, and ask for Run all again.
+A line that already ran on Colab with the same recipe, selection and script is
+skipped, so a session that broke off carries on where it stopped. The free GPU
+time runs out after a few hours a day. Colab then says the runtime
+disconnected "because of inactivity or maximum length" and, on reconnecting,
+that it cannot connect to a GPU because of usage limits. Tell the student to
+close that window, not to connect without a GPU, and to press Run all the next
+day. If a run failed, the reason is at the end of its file in
+`results/colab_logs/`; fix it, push, and ask for Run all again.
 
 For Track B photos of the student's own, the student puts the `data/mine`
 folder into Google Drive as `My Drive/mas1004/assignment2/data/mine` (on

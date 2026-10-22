@@ -15,6 +15,7 @@ submission.json. The model does its own normalisation; export.py puts it
 inside the ONNX file.
 """
 
+import copy
 from pathlib import Path
 
 import numpy as np
@@ -108,19 +109,95 @@ def balanced_accuracy(true, pred):
 # ---------------------------------------------------------------------------
 # Measuring an ONNX file: parameters and multiply-adds
 
+# Operations whose multiply-adds are counted: convolutions and matrix products.
+COUNTED_OPS = {"Conv", "ConvTranspose", "ConvInteger", "QLinearConv",
+               "Gemm", "MatMul", "MatMulInteger", "QLinearMatMul", "Einsum"}
+
+# Operations that do little work for each number they make. A file with any
+# operation that is in neither list is refused, so no work goes uncounted.
+CHEAP_OPS = {
+    # arithmetic and comparisons, one number at a time
+    "Add", "Sub", "Mul", "Div", "Pow", "Mod", "Neg", "Abs", "Sign", "Reciprocal",
+    "Sqrt", "Exp", "Log", "Erf", "Sin", "Cos", "Tan", "Atan", "Floor", "Ceil",
+    "Round", "Min", "Max", "Mean", "Sum", "Clip", "Where", "Equal", "Less",
+    "LessOrEqual", "Greater", "GreaterOrEqual", "And", "Or", "Xor", "Not",
+    "IsNaN", "IsInf", "Cast", "CastLike",
+    # activations
+    "Relu", "LeakyRelu", "PRelu", "Elu", "Selu", "Celu", "Gelu", "Sigmoid",
+    "HardSigmoid", "HardSwish", "Tanh", "Softplus", "Softsign", "Mish",
+    "ThresholdedRelu", "Softmax", "LogSoftmax",
+    # normalisation
+    "BatchNormalization", "LayerNormalization", "GroupNormalization",
+    "InstanceNormalization", "LpNormalization", "Dropout",
+    # pooling and reductions
+    "MaxPool", "AveragePool", "GlobalAveragePool", "GlobalMaxPool",
+    "ReduceMean", "ReduceSum", "ReduceMax", "ReduceMin", "ReduceProd",
+    "ReduceL1", "ReduceL2", "ReduceSumSquare", "ReduceLogSum",
+    "ReduceLogSumExp", "ArgMax", "ArgMin", "CumSum",
+    # moving numbers around
+    "Constant", "ConstantOfShape", "Identity", "Shape", "Size", "Range",
+    "Reshape", "Flatten", "Squeeze", "Unsqueeze", "Transpose", "Concat",
+    "Split", "Slice", "Gather", "GatherElements", "GatherND", "Expand", "Tile",
+    "Pad", "Resize", "DepthToSpace", "SpaceToDepth", "Trilu", "OneHot",
+    # 8-bit numbers
+    "QuantizeLinear", "DequantizeLinear", "DynamicQuantizeLinear",
+}
+
+
 def _shape_of(name, shapes, initializers):
     if name in initializers:
         return list(initializers[name].dims)
     return shapes.get(name)
 
 
+def _einsum_macs(equation, inputs):
+    """Multiply-adds of an Einsum: the product of the sizes of all its letters."""
+    sizes, rest = {}, []
+    for term, shape in zip(equation.replace(" ", "").split("->")[0].split(","), inputs):
+        letters = term.replace("...", "")
+        if "..." in term:
+            i = term.index("...")
+            n = len(shape) - len(letters)
+            rest.append(shape[i:i + n])
+            shape = shape[:i] + shape[i + n:]
+        for letter, dim in zip(letters, shape):
+            sizes[letter] = max(sizes.get(letter, 1), dim)
+    # the dimensions under "..." broadcast against each other, from the right
+    width = max((len(r) for r in rest), default=0)
+    dots = [max([1] + [r[-k] for r in rest if len(r) >= k]) for k in range(1, width + 1)]
+    return int(np.prod(list(sizes.values()) + dots))
+
+
+def _run_shapes(model, size):
+    """Shapes of every tensor, from running the model once on a black photo."""
+    import onnx
+    import onnxruntime
+    model = copy.deepcopy(model)
+    seen = {o.name for o in model.graph.output}
+    for node in model.graph.node:
+        for name in node.output:
+            if name and name not in seen:
+                model.graph.output.append(onnx.ValueInfoProto(name=name))
+                seen.add(name)
+    options = onnxruntime.SessionOptions()
+    options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_DISABLE_ALL
+    options.log_severity_level = 4  # the error comes back in the exception; do not print it twice
+    session = onnxruntime.InferenceSession(model.SerializeToString(), options, providers=["CPUExecutionProvider"])
+    names = [o.name for o in session.get_outputs()]
+    values = session.run(names, {"image": np.zeros((1, 3, size, size), np.float32)})
+    return {name: list(np.shape(v)) for name, v in zip(names, values)}
+
+
 def measure_onnx(path, size):
     """Parameters and multiply-adds of an ONNX model for one size x size photo.
 
     Parameters are all numbers stored in the file (initializers and constant
-    tensors). Multiply-adds are counted for Conv, ConvTranspose, Gemm and
-    MatMul, which is where almost all the work in an image model is; the
-    elementwise operations around them are left out, as is usual.
+    tensors). Multiply-adds are counted for convolutions and matrix products
+    (COUNTED_OPS), which is where almost all the work in an image model is.
+    The cheap operations around them (CHEAP_OPS) count nothing, except when
+    one makes more numbers than its largest input has: then each number it
+    makes counts as one multiply-add. A file with an operation in neither
+    list is refused.
 
     Returns a dict with parameters, gmacs, file_mb, opset, ops and problems,
     a list of the rules the file breaks (empty when it is fine).
@@ -152,7 +229,7 @@ def measure_onnx(path, size):
         for d, value in zip(dims, (1, 3, size, size)):
             d.ClearField("dim_param")
             d.dim_value = value
-    inferred = shape_inference.infer_shapes(model)
+    inferred = shape_inference.infer_shapes(model, data_prop=True)
 
     shapes = {}
     for info in list(inferred.graph.value_info) + list(inferred.graph.input) + list(inferred.graph.output):
@@ -169,42 +246,78 @@ def measure_onnx(path, size):
                     parameters += int(numpy_helper.to_array(attr.t).size)
 
     ops = sorted({n.op_type for n in graph.node})
+    refused = False
     for node in graph.node:
         if node.domain not in ("", "ai.onnx"):
             problems.append(f"operation {node.op_type} from domain {node.domain!r} is not standard ONNX")
-        if node.op_type in ("Loop", "If", "Scan"):
+            refused = True
+        elif node.op_type in ("Loop", "If", "Scan"):
             problems.append(f"operation {node.op_type} (control flow) is not allowed")
+            refused = True
+    unmeasured = [op for op in ops if op not in COUNTED_OPS | CHEAP_OPS | {"Loop", "If", "Scan"}
+                  and any(n.op_type == op and n.domain in ("", "ai.onnx") for n in graph.node)]
+    for op in unmeasured:
+        problems.append(f"operation {op} is not one the grader can measure; ask in class")
+    refused = refused or bool(unmeasured)
+
+    # Static inference cannot follow shapes that the model works out while it
+    # runs (some transformers do). Then run it once and look.
+    if not refused and any(name and name not in shapes for node in inferred.graph.node for name in node.output):
+        try:
+            shapes.update(_run_shapes(inferred, size))
+        except Exception as e:
+            problems.append(f"the model does not run on one {size} x {size} photo: {str(e)[:200]}")
+            refused = True
 
     macs = 0
     unknown = []
     for node in inferred.graph.node:
-        if node.op_type in ("Conv", "ConvTranspose"):
-            weight = _shape_of(node.input[1], shapes, initializers)
+        op = node.op_type
+        if op in ("Conv", "ConvTranspose", "ConvInteger", "QLinearConv"):
+            weight = _shape_of(node.input[3 if op == "QLinearConv" else 1], shapes, initializers)
             out = shapes.get(node.output[0])
             inp = shapes.get(node.input[0])
             if weight is None or out is None or inp is None:
-                unknown.append(node.name or node.op_type)
+                unknown.append(node.name or op)
                 continue
-            if node.op_type == "Conv":
-                # out: (1, Cout, H, W); weight: (Cout, Cin/groups, kh, kw)
-                macs += int(np.prod(out)) * int(np.prod(weight[1:]))
-            else:
+            if op == "ConvTranspose":
                 # weight: (Cin, Cout/groups, kh, kw); every input pixel is spread over a kernel
                 macs += int(np.prod(inp)) * int(np.prod(weight[1:]))
-        elif node.op_type in ("Gemm", "MatMul"):
+            else:
+                # out: (1, Cout, H, W); weight: (Cout, Cin/groups, kh, kw)
+                macs += int(np.prod(out)) * int(np.prod(weight[1:]))
+        elif op in ("Gemm", "MatMul", "MatMulInteger", "QLinearMatMul"):
             a = _shape_of(node.input[0], shapes, initializers)
-            b = _shape_of(node.input[1], shapes, initializers)
+            b = _shape_of(node.input[3 if op == "QLinearMatMul" else 1], shapes, initializers)
             out = shapes.get(node.output[0])
             if a is None or b is None or out is None:
-                unknown.append(node.name or node.op_type)
+                unknown.append(node.name or op)
                 continue
-            if node.op_type == "Gemm":
+            if op == "Gemm":
                 trans_a = any(at.name == "transA" and at.i for at in node.attribute)
                 k = a[0] if trans_a else a[-1]
             else:
                 k = a[-1]
             macs += int(np.prod(out)) * int(k)
-    if unknown:
+        elif op == "Einsum":
+            inputs = [_shape_of(name, shapes, initializers) for name in node.input]
+            if any(s is None for s in inputs):
+                unknown.append(node.name or op)
+                continue
+            equation = next(at.s.decode() for at in node.attribute if at.name == "equation")
+            macs += _einsum_macs(equation, inputs)
+        elif op in CHEAP_OPS and op != "Constant":
+            # A cheap operation that makes more numbers than it was given, as
+            # in a matrix product written as a broadcast Mul and a ReduceSum.
+            outs = [shapes.get(name) for name in node.output if name]
+            ins = [_shape_of(name, shapes, initializers) for name in node.input if name]
+            if any(s is None for s in outs + ins):
+                unknown.append(node.name or op)
+                continue
+            made = max((int(np.prod(s)) for s in outs), default=0)
+            if made > max((int(np.prod(s)) for s in ins), default=0):
+                macs += made
+    if unknown and not refused:
         problems.append(f"could not work out the size of {len(unknown)} operations ({', '.join(unknown[:3])}); "
                         "export with a fixed image size")
 

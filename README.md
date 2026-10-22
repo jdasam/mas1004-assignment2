@@ -32,8 +32,7 @@ measure what each one did, and understand why. The leaderboard is there to
 make that fun. Three things matter most:
 
 - One change at a time, measured. "I left out the indoor photos, and the
-  validation score went from 0.451 to 0.458, the mean of two seeds each"
-  tells us something. "I changed six things and it got better" does not.
+  validation score went from 0.451 to 0.467" tells us something. "I changed six things and it got better" does not.
 - Your own judgement in the loop. Look at the photos your model gets wrong,
   decide what to do about them, and measure whether your decision helped.
   Your agent can make the changes; you decide which ones.
@@ -73,16 +72,30 @@ repository, and a nickname for the leaderboard. Only the nickname is shown.
 
 ### Google Colab
 
-Colab gives you a GPU for free. One Track A training takes about 5 minutes
+Colab gives you a GPU for free. One Track A training takes about 6 minutes
 there, against about 35 to 50 minutes on a laptop without a GPU. At the end of
 the setup, your agent tells you how long one takes on your computer and gives
 you a link to the notebook in your repository, which opens it in Colab.
 
-You do nothing in Colab but press one button. Your agent writes the runs into
-your repository and pushes them; you open the link and choose Runtime, Run
-all; when your browser has downloaded `from_colab.zip`, you tell your agent,
-and it brings the results into your repository. The first time, Colab asks
-you to connect your Google Drive and for the link to the starter photos.
+You do not write anything in Colab. Your agent writes the runs into your
+repository and pushes them; you open the link and choose Runtime, Run all;
+when your browser has downloaded `from_colab.zip`, you tell your agent, and it
+brings the results into your repository. In every new Colab session you also:
+
+- choose "Run anyway" when Colab warns that the notebook was not written by
+  Google
+- choose "Connect to Google Drive", choose your Google account in the window
+  that opens, and allow everything it asks for
+
+The first time, the notebook also asks for the link to the starter photos.
+It takes 5 to 10 minutes before the first training starts.
+
+The free GPU time is limited, a few hours a day. When it runs out, Colab says
+the runtime disconnected "because of inactivity or because it reached its
+maximum length", and when you reconnect it says it cannot connect to a GPU
+because of usage limits. Close that window; do not choose "Connect without
+GPU". The runs that finished are kept in your Drive, and Run all on the next
+day carries on with the rest.
 
 ## How you work
 
@@ -172,12 +185,13 @@ https://jdasam.github.io/mas1004-leaderboard/
 - After the deadline, your last releases are scored once on the final
   photos. That decides the final ranking. The final photos are a different
   set from the leaderboard photos: street photos taken with a phone.
-  `data/sample_target/` has ten photos per city taken the same way. A change
+  `data/sample_target/` will have ten photos per city taken the same way;
+  they come out later. A change
   that helps on the leaderboard does not always help on the final photos,
   and the final leaderboard shows both scores side by side.
 
 A difference of two or three points between two people on the leaderboard is
-mostly luck: the same recipe trained with another seed can move that much.
+mostly luck: the same recipe trained again can move that much.
 Compare your own changes on the validation photos in `data/starter/val`,
 which `official.py` and `check_submission.py` score for you.
 
@@ -207,8 +221,12 @@ Write this down:
 
 ## Problem 2. The baseline, released (the mid-point check)
 
-Train the starter recipe with `official.py` on seeds 0 and 1 and release it as
-`track-a-1`. Look at its mistakes with `src/curate.py mistakes`.
+Train the starter recipe with `official.py` twice, with seeds 0 and 1, and
+release it as `track-a-1`. The seed sets the random choices in training, such
+as the order of the photos, and it is the only thing you change between the
+two runs. Their scores still differ, and a change that moves the score by
+less than this difference may be luck. Look at the mistakes with
+`src/curate.py mistakes`.
 
 By the mid-point check (30 October, 22:00):
 - your nickname and repository are registered, and you have made a Track A
@@ -220,7 +238,7 @@ By the mid-point check (30 October, 22:00):
 ## Problem 3. Track A: better choices with the same photos and budget
 
 Make at least four changes to your recipe or selection, one at a time, each
-measured with at least two seeds, and keep what helps. Some directions, not a
+measured against the run before it, and keep what helps. Some directions, not a
 list to work through:
 
 - Busan has fewer than half as many training photos as Tokyo. What does the
@@ -234,8 +252,7 @@ list to work through:
   photos several times? On a bigger batch or more steps?
 
 Write this down:
-- A table of your runs: what changed, the validation score for each seed, the
-  mean.
+- A table of your runs: what changed, and the validation score.
 - For each change: why you tried it, and what you think the result means.
 
 ## Problem 4. Your judgement in the loop
@@ -267,8 +284,8 @@ Start from `src/train_b.py` or from anything else. Things people do:
 - more photos, especially photos like the final ones. `src/gps_sort.py`
   sorts a folder of phone photos into the five cities by the GPS in them,
   and saves copies without the location data.
-  `data/sample_target/` has ten photos per city taken the same way as the
-  final ones.
+  `data/sample_target/` will have ten photos per city taken the same way as
+  the final ones.
 - a different small model, or a bigger image size for a smaller model
 - everything that worked in Track A
 

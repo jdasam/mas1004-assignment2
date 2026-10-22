@@ -30,6 +30,7 @@ fourth photo only.
 
 import argparse
 import csv
+import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
@@ -110,7 +111,7 @@ def predict(onnx_path, paths, size=rules.TRACK_A_IMAGE_SIZE, batch=32):
     import onnxruntime
     session = onnxruntime.InferenceSession(str(onnx_path), providers=["CPUExecutionProvider"])
     out = []
-    with ThreadPoolExecutor(8) as pool:
+    with ThreadPoolExecutor(os.cpu_count() or 2) as pool:
         for i in range(0, len(paths), batch):
             x = np.stack(list(pool.map(lambda p: rules.grader_input(rules.load_photo(p), size),
                                        paths[i:i + batch])))

@@ -10,6 +10,6 @@ End the log with your plan for what to try next.
 ## <date> <tag> (Track A or B)
 - changed: what is different from the run before
 - why: your reason
-- validation: seed 0 0.000, seed 1 0.000, mean 0.000 (before: 0.000)
+- validation: 0.000 (before: 0.000)
 - what it means: what you think the result says
 -->

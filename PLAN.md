@@ -14,7 +14,7 @@ change, says what stays the same, and gives the change a name (its tag):
 
 ```
 In track_a/recipe.py, draw every city equally often, and change nothing
-else. Call it balanced and train it with seeds 0 and 1.
+else. Call it balanced and train it.
 ```
 
 When something fails, give the agent the error text as it is, not your summary
@@ -45,15 +45,18 @@ Train the starter recipe with seeds 0 and 1, with the tag baseline.
 If one run takes more than about 15 minutes on your computer, the agent
 prepares the runs for Colab instead. Then you open your Colab link, choose
 Runtime, Run all, wait until your browser downloads `from_colab.zip`, and tell
-the agent. That is all you do on Colab, every time.
+the agent. README, "Google Colab", says what Colab asks you in every new
+session.
 
 Check: `experiments.csv` has two rows with the tag baseline and validation
-scores near 0.45, and `LOG.md` has an entry for them.
+scores near 0.45, and `LOG.md` has an entry for them. The two scores differ a
+little although only the seed differs: that is how much a score moves by
+chance.
 
 ## Step 3. Look at the mistakes
 
 ```
-Show me the mistakes of baseline seed 0.
+Show me the mistakes of the baseline.
 ```
 
 The agent makes sheets of the validation photos the model got most
@@ -88,12 +91,9 @@ example at the top. Before it trains, the agent shows you what it changed.
 
 Check, for every change:
 - the change is exactly the one you asked for, and nothing else changed
-- two seeds, with the same seeds as the run you compare it with
-- an entry in `LOG.md` with the scores, the mean, and your reason
+- an entry in `LOG.md` with the score and your reason
 
-The starter recipe's three seeds scored 0.453, 0.448 and 0.447. A change that
-moves the mean by less than about one point may be luck. Do this at least four
-times, and keep what helps.
+Do this at least four times, and keep what helps.
 
 ## Step 7. Your judgement in the loop (Problem 4)
 
@@ -103,7 +103,7 @@ for; it does not choose photos.
 1. Look at the mistakes (Step 3) or at the training photos the model doubts
    most:
    ```
-   Show me the suspects of balanced seed 0.
+   Show me the suspects of balanced.
    ```
 2. Write down, before you change anything, what you see and the rule you
    will follow. For example: "drop training photos taken indoors".
@@ -111,7 +111,7 @@ for; it does not choose photos.
    ```
    Drop photos 5, 17 and 40 from suspects_busan_00, reason "indoors".
    ```
-4. Train the new selection with seeds 0 and 1, and compare.
+4. Train the new selection and compare.
 
 Check: `track_a/dropped.csv` lists every photo you dropped with your reason,
 and `LOG.md` has the scores before and after. Keep the exact requests you gave
@@ -126,7 +126,8 @@ Train train_b.py as it is and make it my Track B submission.
 Then release it, as in Step 4, as `track-b-1`.
 
 Check: `check_submission.py` printed "format and limits: OK", and you have
-its scores on the validation photos and on `data/sample_target`.
+the score on the validation photos (and on `data/sample_target`, once those
+photos are out).
 
 ## Step 9. Track B, better (Problem 5)
 

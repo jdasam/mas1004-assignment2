@@ -20,6 +20,7 @@ import csv
 import json
 import os
 import shutil
+import subprocess
 import sys
 import time
 from datetime import datetime
@@ -87,6 +88,20 @@ def measure(net, rows, size, device, workers):
     return rules.balanced_accuracy(torch.cat(true).numpy(), torch.cat(pred).numpy())
 
 
+def git_commit():
+    try:
+        out = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True)
+        return out.stdout.strip()
+    except OSError:
+        return ""
+
+
+def shown(folder):
+    """A folder as written in submission.json: relative to the repository when it is inside it."""
+    path = Path(folder).absolute()
+    return path.relative_to(ROOT).as_posix() if path.is_relative_to(ROOT) else str(folder)
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--tag", required=True)
@@ -148,7 +163,7 @@ def main():
     out = ROOT / "results" / args.tag
     export_onnx(net, out / "model.onnx", args.size)
     info = {"image_size": args.size, "starting_weights": weights_name,
-            "data": " + ".join(args.folders), "summary": f"{args.model} at {args.size}, {args.epochs} epochs"}
+            "data": " + ".join(shown(f) for f in args.folders), "summary": f"{args.model} at {args.size}, {args.epochs} epochs"}
     (out / "submission.json").write_text(json.dumps(info, indent=2))
     m = rules.measure_onnx(out / "model.onnx", args.size)
     print(f"wrote {out / 'model.onnx'}: {m['parameters'] / 1e6:.2f} million parameters, {m['gmacs']:.2f} billion multiply-adds")
@@ -169,7 +184,8 @@ def main():
         w.writerow({"finished": datetime.now().isoformat(timespec="seconds"), "track": "B", "tag": args.tag,
                     "budget": args.epochs * len(loader) * args.batch_size, "val_score": round(score, 4),
                     **{c: round(per_city.get(c, 0), 4) for c in CITIES}, "train_seconds": round(train_seconds, 1),
-                    "device": str(device), "selection": f"{args.model} {args.size}px; " + " + ".join(args.folders)})
+                    "device": str(device), "selection": f"{args.model} {args.size}px; " + " + ".join(shown(f) for f in args.folders),
+                    "commit": git_commit()})
 
 
 if __name__ == "__main__":

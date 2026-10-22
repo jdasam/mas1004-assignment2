@@ -5,6 +5,7 @@ This file is complete. Do not change it.
     python src/check_submission.py                        Track B: submission/
     python src/check_submission.py --onnx results/baseline_seed0/model.onnx --size 224
     python src/check_submission.py --photos data/mine     score on any folder of <city>/ photos
+    python src/check_submission.py --no-val               skip data/starter/val (train_b.py printed it)
 
 It reads the ONNX file only, never your training code, so it measures exactly
 what you hand in. It checks the format and the size limits in rules.py, then
@@ -14,6 +15,7 @@ there), preparing every photo with rules.grader_input as the grader does.
 
 import argparse
 import json
+import os
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -58,13 +60,13 @@ def check_model(onnx_path, size, track):
         if m["parameters"] > rules.TRACK_B_MAX_PARAMETERS:
             problems.append(f"{m['parameters']:,} parameters, more than {rules.TRACK_B_MAX_PARAMETERS:,}")
         if m["gmacs"] > rules.TRACK_B_MAX_GMACS:
-            problems.append(f"{m['gmacs']:.2f} billion multiply-adds per photo, more than {rules.TRACK_B_MAX_GMACS}")
+            problems.append(f"{m['gmacs']:.3f} billion multiply-adds per photo, more than {rules.TRACK_B_MAX_GMACS}")
         if m["file_mb"] > rules.TRACK_B_MAX_FILE_MB:
             problems.append(f"the file is {m['file_mb']:.0f} MB, more than {rules.TRACK_B_MAX_FILE_MB} MB")
     return m, problems
 
 
-def score_folder(onnx_path, folder, size, threads=8, batch=32):
+def score_folder(onnx_path, folder, size, threads=os.cpu_count() or 2, batch=32):
     """Balanced accuracy of the ONNX model on folder/<city>/ photos."""
     import onnxruntime
     rows = rules.list_photos(folder)
@@ -96,6 +98,8 @@ def main():
     ap.add_argument("--onnx", help="check this ONNX file instead (Track A runs write one)")
     ap.add_argument("--size", type=int, help="the image size for --onnx")
     ap.add_argument("--photos", nargs="*", help="folders of <city>/ photos to score on")
+    ap.add_argument("--no-val", action="store_true",
+                    help="do not score data/starter/val; train_b.py has printed that score already")
     args = ap.parse_args()
 
     problems = []
@@ -121,8 +125,13 @@ def main():
         raise SystemExit(1)
     print("  format and limits: OK")
 
-    folders = args.photos if args.photos is not None else [
-        p for p in (ROOT / "data" / "starter" / "val", ROOT / "data" / "sample_target") if p.exists()]
+    folders = args.photos
+    if folders is None:
+        folders = [ROOT / "data" / "sample_target"] if args.no_val else \
+            [ROOT / "data" / "starter" / "val", ROOT / "data" / "sample_target"]
+        if not (ROOT / "data" / "sample_target").exists():
+            print("\ndata/sample_target is not there yet: the photos come later.")
+        folders = [p for p in folders if p.exists()]
     for folder in folders:
         t = time.time()
         r = score_folder(onnx_path, folder, size)

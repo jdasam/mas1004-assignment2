@@ -19,8 +19,7 @@ The notebook on Colab runs:
 colab_runs.txt has one command per line, each starting with "python src/",
 for example
 
-    python src/official.py --tag balanced --seed 0
-    python src/official.py --tag balanced --seed 1
+    python src/official.py --tag balanced
     python src/curate.py mistakes results/balanced_seed0/model.onnx --every 2
 
 Lines starting with # are skipped. A line that already ran with the same
@@ -112,6 +111,8 @@ def log_name(words):
     tag = words[words.index("--tag") + 1] if "--tag" in words[:-1] else ""
     seed = f"_seed{words[words.index('--seed') + 1]}" if "--seed" in words[:-1] else ""
     stem = Path(words[1]).stem
+    if stem == "curate" and len(words) > 2:
+        stem += f"_{words[2]}"
     return f"{datetime.now():%m%d_%H%M%S}_{stem}" + (f"_{tag}{seed}" if tag else "") + ".txt"
 
 
