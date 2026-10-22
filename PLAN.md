@@ -116,7 +116,8 @@ for; it does not choose photos.
    will follow. For example: "drop training photos taken indoors".
 3. Name the photos by sheet and number:
    ```
-   Drop photos 5, 17 and 40 from suspects_busan_00, reason "indoors".
+   Drop photos 5, 17 and 40 from suspects_baseline_seed0_busan_00,
+   reason "indoors".
    ```
 4. Train the new selection and compare.
 

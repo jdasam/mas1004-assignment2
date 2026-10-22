@@ -131,6 +131,12 @@ def cmd_look(args):
           f"{names[0]} to {names[-1]}" if names else f"no selected {args.city} photos")
 
 
+def run_name(onnx):
+    """results/baseline_seed0/model.onnx -> baseline_seed0, for the names of the sheets."""
+    path = Path(onnx)
+    return path.parent.name if path.name == "model.onnx" else path.stem
+
+
 def cmd_mistakes(args):
     rows = rules.list_photos(args.photos)[::args.every]
     probs = predict(args.onnx, [p for p, _ in rows], args.size)
@@ -139,7 +145,7 @@ def cmd_mistakes(args):
         total = sum(1 for _, c in rows if c == city)
         wrong.sort(reverse=True)
         items = [(rows[k][0], f"-> {CITIES[probs[k].argmax()]} {p:.2f}") for p, k in wrong[:args.n]]
-        names = draw_sheets(f"mistakes_{city}", items)
+        names = draw_sheets(f"mistakes_{run_name(args.onnx)}_{city}", items)
         print(f"{city}: {len(wrong)} of {total} wrong; the {len(items)} most confident on {', '.join(names)}")
 
 
@@ -147,7 +153,8 @@ def cmd_suspects(args):
     paths = read_selection()[::args.every]
     probs = predict(args.onnx, [TRAIN / p for p in paths], args.size)
     OUT.mkdir(parents=True, exist_ok=True)
-    with open(OUT / "suspects.csv", "w", newline="", encoding="utf-8") as f:
+    table = OUT / f"suspects_{run_name(args.onnx)}.csv"
+    with open(table, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["path", "city", "own_city_probability", "answer"])
         for p, pr in zip(paths, probs):
@@ -155,9 +162,9 @@ def cmd_suspects(args):
     for i, city in enumerate(CITIES):
         mine = sorted((probs[k][i], k) for k, p in enumerate(paths) if p.split("/")[0] == city)
         items = [(TRAIN / paths[k], f"{city} {pr:.2f}, says {CITIES[probs[k].argmax()]}") for pr, k in mine[:args.n]]
-        names = draw_sheets(f"suspects_{city}", items)
+        names = draw_sheets(f"suspects_{run_name(args.onnx)}_{city}", items)
         print(f"{city}: the {len(items)} photos with the lowest {city} probability on {', '.join(names)}")
-    print(f"all probabilities in {OUT / 'suspects.csv'}")
+    print(f"all probabilities in {table}")
 
 
 def resolve(targets):
@@ -188,7 +195,7 @@ def cmd_drop(args):
             w.writerow(["path", "reason", "when"])
         for p in paths:
             w.writerow([p, args.reason, datetime.now().isoformat(timespec="seconds")])
-    print(f"dropped {len(paths)} photos ({args.reason}); the selection now has {len(kept)}")
+    print(f"dropped {len(paths)} photo{'s' * (len(paths) != 1)} ({args.reason}); the selection now has {len(kept)}")
 
 
 def cmd_undrop(args):
@@ -205,7 +212,7 @@ def cmd_undrop(args):
             w = csv.DictWriter(f, fieldnames=["path", "reason", "when"])
             w.writeheader()
             w.writerows(rows)
-    print(f"put back {len(paths)} photos")
+    print(f"put back {len(paths)} photo{'s' * (len(paths) != 1)}")
 
 
 def cmd_count(args):

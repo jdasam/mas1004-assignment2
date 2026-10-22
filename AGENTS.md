@@ -152,7 +152,8 @@ uv run python src/official.py --quick
 The usual changes in `recipe.py`:
 
 - Every city drawn equally often: in `sample_weights`, give each photo one
-  over the number of photos of its city:
+  over the number of photos of its city, with `import collections` at the top
+  of the file:
   ```
   counts = collections.Counter(cities)
   return [1.0 / counts[c] for c in cities]
@@ -206,14 +207,16 @@ uv run python src/curate.py undrop busan/commons_104708282.jpg
 ```
 
 Sheets go to `results/curate/<name>_NN.png`, each with a `.csv` of the numbers
-and paths on it. Open the PNG for the student to look at. `look` without
-`--every` draws every selected photo of the city (Tokyo is about 280 sheets);
-`--every 20` gives a few sheets for a first look. `mistakes` and `suspects`
-run the model on the CPU and take a few minutes; `--every 4` uses every fourth
-photo. After training on Colab, run them on Colab too (the models stay there),
-with `--every 4` for `suspects`: Colab has two CPU cores, and `suspects` on
-every training photo takes almost half an hour there. Open the sheets that
-come back.
+and paths on it. Sheets of `mistakes` and `suspects` carry the run's name
+(`mistakes_baseline_seed0_busan_00`), so a later run does not replace them.
+Open the PNG for the student to look at. `look` without `--every` draws every
+selected photo of the city (Tokyo is about 280 sheets); `--every 20` gives a
+few sheets for a first look. `mistakes` and `suspects` run the model on the
+CPU and take a few minutes; `--every 4` uses every fourth photo. After
+training on Colab, run them on Colab too (the models stay there), with
+`--every 4` for `suspects`: Colab has two CPU cores, and `suspects` on every
+training photo takes almost half an hour there. Open the sheets that come
+back.
 
 ## Track B
 

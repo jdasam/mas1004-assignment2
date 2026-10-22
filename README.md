@@ -131,7 +131,8 @@ computer runs the same file. It fixes:
   and frames of YouTube walking and driving videos. The training photos are
   as they were collected, not cleaned: some are museum objects, maps, food or
   press conferences, and the frames of one video look much alike. The
-  validation photos have been cleaned.
+  validation photos were cleaned by a program, which took out most such
+  photos but not all.
 - the budget: 60,000 photos go through the model during training. A batch of
   64 means 937 steps; a batch of 128 means 468.
 - the image size the model sees: 224 by 224
