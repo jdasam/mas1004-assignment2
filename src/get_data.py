@@ -15,8 +15,6 @@ your Drive, so that each new Colab session does not download it.
 data/starter/train/<city>/   training photos (Track A may use only these)
 data/starter/val/<city>/     validation photos, by different photographers
 data/starter/ATTRIBUTION.csv the author, licence and source page of every photo
-data/sample_target/<city>/   ten photos per city taken the way the final test photos were
-                             (not in the download yet; they come later)
 
 The photos are from Wikimedia Commons, OSV-5M (Mapillary) and YouTube
 walking and driving videos; ATTRIBUTION.csv gives the author, licence and
@@ -90,7 +88,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--link", help="the link to the starter photos on Cyber Campus")
     ap.add_argument("--into", default=str(ROOT / "data"),
-                    help="where starter/ and sample_target/ go (on Colab, the fast local disk)")
+                    help="where starter/ goes (on Colab, the fast local disk)")
     ap.add_argument("--keep", help="keep the zip in this file too, and take it from there next time")
     args = ap.parse_args()
     data = Path(args.into)
@@ -120,9 +118,8 @@ def main():
         digest = sha256_of(zip_path)
         if SHA256 and digest != SHA256:
             sys.exit(f"The download is damaged (sha256 {digest[:12]}...). Run this again.")
-    for name in ("starter", "sample_target"):
-        if (data / name).is_dir() and not (data / name).is_symlink():
-            shutil.rmtree(data / name)
+    if (data / "starter").is_dir() and not (data / "starter").is_symlink():
+        shutil.rmtree(data / "starter")
     with zipfile.ZipFile(zip_path) as z:
         z.extractall(data)
     if keep and downloaded:
@@ -138,9 +135,6 @@ def main():
     if counts != EXPECTED:
         sys.exit(f"Expected {EXPECTED} photos, found {counts}.")
     print(f"data/starter: {counts['train']} training and {counts['val']} validation photos")
-    sample = len(list((data / "sample_target").glob("*/*.jpg")))
-    print(f"data/sample_target: {sample} photos" if sample else
-          "data/sample_target: not in this download yet; the photos come later")
 
 
 if __name__ == "__main__":

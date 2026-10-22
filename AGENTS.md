@@ -225,9 +225,8 @@ uv run python src/gps_sort.py <folder of photos>
   counts is `submission/model.onnx` and `submission/submission.json`.
 - `check_submission.py` checks the format and the limits (12 million
   parameters, 2.0 billion multiply-adds at the chosen size) exactly as the
-  grader does, then scores the model on `data/starter/val` and on
-  `data/sample_target` (those photos come later). It must print "format and
-  limits: OK".
+  grader does, then scores the model on `data/starter/val`. It must print
+  "format and limits: OK".
 - Some sizes, measured: ResNet18 at 224 has 11.2 million parameters and 1.81
   billion multiply-adds (288 is over the limit); MobileNetV3-Large 4.2 million,
   0.44 billion at 320 and 0.85 at 448; EfficientNet-B0 4.0 million, 0.78

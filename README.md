@@ -184,9 +184,7 @@ https://jdasam.github.io/mas1004-leaderboard/
   grader trained, so you can compare it with your own runs.
 - After the deadline, your last releases are scored once on the final
   photos. That decides the final ranking. The final photos are a different
-  set from the leaderboard photos: street photos taken with a phone.
-  `data/sample_target/` will have ten photos per city taken the same way;
-  they come out later. A change
+  set from the leaderboard photos: street photos taken with a phone. A change
   that helps on the leaderboard does not always help on the final photos,
   and the final leaderboard shows both scores side by side.
 
@@ -284,8 +282,6 @@ Start from `src/train_b.py` or from anything else. Things people do:
 - more photos, especially photos like the final ones. `src/gps_sort.py`
   sorts a folder of phone photos into the five cities by the GPS in them,
   and saves copies without the location data.
-  `data/sample_target/` will have ten photos per city taken the same way as
-  the final ones.
 - a different small model, or a bigger image size for a smaller model
 - everything that worked in Track A
 

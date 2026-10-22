@@ -126,8 +126,7 @@ Train train_b.py as it is and make it my Track B submission.
 Then release it, as in Step 4, as `track-b-1`.
 
 Check: `check_submission.py` printed "format and limits: OK", and you have
-the score on the validation photos (and on `data/sample_target`, once those
-photos are out).
+its score on the validation photos.
 
 ## Step 9. Track B, better (Problem 5)
 

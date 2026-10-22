@@ -5,12 +5,12 @@ This file is complete. Do not change it.
     python src/check_submission.py                        Track B: submission/
     python src/check_submission.py --onnx results/baseline_seed0/model.onnx --size 224
     python src/check_submission.py --photos data/mine     score on any folder of <city>/ photos
-    python src/check_submission.py --no-val               skip data/starter/val (train_b.py printed it)
+    python src/check_submission.py --no-val               only the checks (train_b.py printed the score)
 
 It reads the ONNX file only, never your training code, so it measures exactly
 what you hand in. It checks the format and the size limits in rules.py, then
-runs the model on data/starter/val (and on data/sample_target, if it is
-there), preparing every photo with rules.grader_input as the grader does.
+runs the model on data/starter/val, preparing every photo with
+rules.grader_input as the grader does.
 """
 
 import argparse
@@ -127,11 +127,8 @@ def main():
 
     folders = args.photos
     if folders is None:
-        folders = [ROOT / "data" / "sample_target"] if args.no_val else \
-            [ROOT / "data" / "starter" / "val", ROOT / "data" / "sample_target"]
-        if not (ROOT / "data" / "sample_target").exists():
-            print("\ndata/sample_target is not there yet: the photos come later.")
-        folders = [p for p in folders if p.exists()]
+        val = ROOT / "data" / "starter" / "val"
+        folders = [val] if val.exists() and not args.no_val else []
     for folder in folders:
         t = time.time()
         r = score_folder(onnx_path, folder, size)
