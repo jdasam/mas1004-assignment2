@@ -10,7 +10,7 @@ What you cannot change, because official.py decides it:
   - the model: ResNet18 with the ImageNet weights, a new last layer of 5
   - the photos: only the ones in selection.csv, with the city of their folder
   - how many photos go through the network in training: rules.TRACK_A_BUDGET
-    (60,000). A bigger batch means fewer steps, not more photos.
+    (250,000). A bigger batch means fewer steps, not more photos.
   - the image size the model sees, 224 x 224
   - mixed precision (float16), and the seed
 

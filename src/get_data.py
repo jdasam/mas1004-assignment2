@@ -19,7 +19,7 @@ data/starter/ATTRIBUTION.csv the author, licence and source page of every photo
 The photos are from Wikimedia Commons, OSV-5M (Mapillary) and YouTube
 walking and driving videos; ATTRIBUTION.csv gives the author, licence and
 source of each. They are for the students of this class only. The shorter
-side of every photo is 256 pixels.
+side of every photo is 512 pixels (480 for the video frames).
 """
 
 import hashlib
@@ -33,7 +33,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SHA256 = "b9e8f5748604b972f5c4a234855d1b2fcfaa77daebc903320acbc7c0b9ca363e"
+SHA256 = "c960cca8a9d23d898a2d3df7df33abd6edeb51fd3ea58855d6bcaebd7d281f55"
 LINK_FILE = ROOT / "data" / "starter_link.txt"
 EXPECTED = {"train": 44257, "val": 12077}
 
@@ -99,6 +99,10 @@ def main():
         print(f"data/starter is already complete: {counts}")
         return
     data.mkdir(parents=True, exist_ok=True)
+    free = shutil.disk_usage(data).free
+    if free < 13e9:
+        sys.exit(f"The starter photos need about 13 GB of free disk space while they are unpacked; "
+                 f"{data} has {free / 1e9:.0f} GB free.")
     zip_path = data / "starter.zip"
     keep = Path(args.keep) if args.keep else None
     if keep and keep.exists():

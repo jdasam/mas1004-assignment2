@@ -29,10 +29,10 @@ checks first, so the setup can be started again after VS Code is reopened.
 4. Install uv if `uv --version` fails (see "Running Python").
 5. Ask the student for the link to the starter photos, which is on Cyber
    Campus, and run `uv run python src/get_data.py --link "<the link>"`. It
-   downloads the photos (about 1.7 GB) into `data/starter/` and checks them. It
-   keeps the link in `data/starter_link.txt`, so later runs need no `--link`.
-   Do not write the link into any file that is pushed: the photos are for
-   this class only.
+   downloads the photos (about 6 GB; it needs 13 GB free while it unpacks
+   them) into `data/starter/` and checks them. It keeps the link in
+   `data/starter_link.txt`, so later runs need no `--link`. Do not write the
+   link into any file that is pushed: the photos are for this class only.
 6. `uv run python src/official.py --quick`. It checks the recipe, trains 20
    steps and measures on 200 validation photos. It must end with
    "validation score" and a line saying how long a full run would take on this
@@ -85,7 +85,7 @@ and everything that trains or runs a model on Colab.
 ## Where to train
 
 `official.py --quick` prints how long a full run would take on this computer.
-If it says more than 15 minutes, train on Colab (see "Training on Colab");
+If it says more than 30 minutes, train on Colab (see "Training on Colab");
 otherwise train here, unless the student prefers Colab. The same goes for
 Track B, whose runs take longer than Track A runs.
 
@@ -118,7 +118,7 @@ uv run python src/official.py --quick
 ```
 
 - `official.py` trains ResNet18 on `track_a/selection.csv` (or all training
-  photos) with `track_a/recipe.py`, for exactly 60,000 photos, then writes
+  photos) with `track_a/recipe.py`, for exactly 250,000 photos, then writes
   `results/<tag>_seed<seed>/model.onnx` and adds a row to `experiments.csv`
   with the validation score. Never change `official.py`, `rules.py`,
   `export.py` or `check_submission.py`.
@@ -171,7 +171,7 @@ The usual changes in `recipe.py`:
   probabilities as well as labels, so `loss_fn` can stay. Draw random numbers
   with torch, random or numpy, which official.py seeds.
 - Learning rate and schedule: `make_optimizer` and `make_scheduler`. The
-  scheduler is stepped once after every step; `total_steps` is 60,000 divided
+  scheduler is stepped once after every step; `total_steps` is 250,000 divided
   by `BATCH_SIZE`.
 - After each step, or at the end (for example averaging the weights):
   `on_step` and `final_model`. `final_model` must return the same ResNet18.
@@ -263,13 +263,13 @@ and bring the results back.
    For Track B, add `--submit` to the training line and then
    `python src/check_submission.py --no-val`: only `submission/` comes back
    from Colab, not the models in `results/`. `--no-val` skips scoring the
-   validation photos again on Colab's two CPU cores (6 minutes);
+   validation photos again on Colab's two CPU cores (about 7 minutes);
    `train_b.py` has printed that score already.
 2. Commit and push `colab_runs.txt` with the code it needs.
 3. Tell the student: open the Colab link from the setup, choose Runtime, Run
    all, and tell you when `from_colab.zip` has downloaded. One Track A run
-   takes about 6 minutes there, plus 5 to 10 minutes to start; a 6-epoch
-   MobileNetV3-Large run of `train_b.py` at 320 takes about 40 minutes. In
+   takes about 25 minutes there, plus 5 to 10 minutes to start; a 6-epoch
+   MobileNetV3-Large run of `train_b.py` at 320 takes about 45 minutes. In
    every new session Colab warns that the notebook was not written by Google
    (the student chooses "Run anyway") and asks to connect Google Drive (the
    student allows everything it asks for). The first time, the notebook also

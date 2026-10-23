@@ -48,14 +48,14 @@ cities apart.
 Train the starter recipe with seeds 0 and 1, with the tag baseline.
 ```
 
-If one run takes more than about 15 minutes on your computer, the agent
+If one run takes more than about 30 minutes on your computer, the agent
 prepares the runs for Colab instead. Then you open your Colab link, choose
 Runtime, Run all, wait until your browser downloads `from_colab.zip`, and tell
 the agent. README, "Google Colab", says what Colab asks you in every new
 session.
 
 Check: `experiments.csv` has two rows with the tag baseline and validation
-scores near 0.45, and `LOG.md` has an entry for them. The two scores differ a
+scores near 0.50, and `LOG.md` has an entry for them. The two scores differ a
 little although only the seed differs: that is how much a score moves by
 chance.
 

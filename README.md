@@ -27,12 +27,13 @@ You work on it in two ways, called tracks. Both are required.
   yourself, ask friends for their travel photos, find more photos online,
   try another small model or a larger image size, ask anyone for ideas. You train it and hand in the trained model.
 
-The point of the assignment is to try several ways of making a model better,
-measure what each one did, and understand why. The leaderboard is there to
-make that fun. Three things matter most:
+The point of the assignment is to find out, by measuring, what makes a model
+better: cleaning the photos it learns from, augmenting them, and collecting
+more of them. Try several ways, measure what each one did, and understand
+why. The leaderboard is there to make that fun. Three things matter most:
 
 - One change at a time, measured. "I left out the indoor photos, and the
-  validation score went from 0.451 to 0.467" tells us something. "I changed six things and it got better" does not.
+  validation score went from 0.498 to 0.515" tells us something. "I changed six things and it got better" does not.
 - Your own judgement in the loop. Look at the photos your model gets wrong,
   decide what to do about them, and measure whether your decision helped.
   Your agent can make the changes; you decide which ones.
@@ -71,7 +72,7 @@ https://raw.githubusercontent.com/jdasam/mas1004-assignment2/main/AGENTS.md
 ```
 
 It makes your copy of this repository, downloads the starter photos (about
-1.7 GB), installs what the assignment needs and trains the starter recipe once
+6 GB), installs what the assignment needs and trains the starter recipe once
 for 20 steps to check that everything works. It asks you for the link to the
 starter photos, which is on Cyber Campus. The photos are for this class only:
 do not share the link or put it in your repository. Then fill in the registration
@@ -80,8 +81,8 @@ repository, and a nickname for the leaderboard. Only the nickname is shown.
 
 ### Google Colab
 
-Colab gives you a GPU for free. One Track A training takes about 6 minutes
-there, against about 35 to 50 minutes on a laptop without a GPU. At the end of
+Colab gives you a GPU for free. One Track A training takes about 25 minutes
+there, against two to four hours on a laptop without a GPU. At the end of
 the setup, your agent tells you how long one takes on your computer and gives
 you a link to the notebook in your repository, which opens it in Colab.
 
@@ -133,8 +134,9 @@ computer runs the same file. It fixes:
   press conferences, and the frames of one video look much alike. The
   validation photos were cleaned by a program, which took out most such
   photos but not all.
-- the budget: 60,000 photos go through the model during training. A batch of
-  64 means 937 steps; a batch of 128 means 468.
+- the budget: 250,000 photos go through the model during training, so it
+  sees each training photo between five and six times. A batch of 64 means
+  3,906 steps; a batch of 128 means 1,953.
 - the image size the model sees: 224 by 224
 - the seeds: the instructor trains your recipe three times, with seeds 0, 1
   and 2, and your score is the mean
@@ -246,7 +248,12 @@ helps. Some directions, not a list to work through:
   model do about that, and what can you do?
 - Some starter photos are not street photos at all: food, museum objects,
   the inside of a shop. Does leaving them out help or hurt, when the budget
-  stays 60,000?
+  stays 250,000?
+- Augmentation changes a photo a little every time it is drawn: a crop, a
+  zoom, other colours, a blur. The model sees each photo five or six times,
+  enough to learn the photos themselves by heart; augmentation makes that
+  harder. The starter photos are 512 pixels on the shorter side, so a crop
+  that zooms in still has detail. Which changes help, and which hurt?
 - A left-right flip turns writing into mirror writing and puts the traffic
   on the other side of the road. Tokyo drives on the left.
 - The budget is fixed. Is it better spent on all photos once or on fewer

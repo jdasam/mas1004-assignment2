@@ -27,7 +27,7 @@ STD = [0.229, 0.224, 0.225]
 
 # Track A: the same model, the same data, the same number of training photos.
 TRACK_A_IMAGE_SIZE = 224
-TRACK_A_BUDGET = 60_000          # photos through the network while training
+TRACK_A_BUDGET = 250_000         # photos through the network while training
 TRACK_A_BATCH_SIZES = (16, 256)  # smallest and largest batch a recipe may use
 TRACK_A_SEEDS = (0, 1, 2)        # the grader trains three times and averages
 
