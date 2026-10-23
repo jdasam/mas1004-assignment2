@@ -2,7 +2,7 @@
 
 MAS1004 Data & AI, 2026 Fall
 
-- Out: Thursday 22 October (introduced in class on Tuesday 27 October)
+- Out: Thursday 22 October (introduced in a recorded lecture)
 - Mid-point check: Friday 30 October, 22:00
 - Due: Tuesday 10 November, 22:00
 - Final results: in class, Thursday 12 November
@@ -11,7 +11,7 @@ MAS1004 Data & AI, 2026 Fall
 
 Everyone in the class solves the same problem: given a photo, say whether it
 was taken in Seoul, Busan, Tokyo, Osaka or Taipei. A leaderboard scores
-everyone's model every morning on frames from YouTube walking and driving
+everyone's model every night on frames from YouTube walking and driving
 videos, from channels that are not in the starter data. The final ranking
 uses a different set: street photos taken with a phone, which nobody sees
 before the deadline.
@@ -173,9 +173,10 @@ your own computer.
 
 ## The leaderboard
 
-Every morning at 6:00, the grader takes the newest release of each track from
-each repository, trains the Track A recipes, scores everything on the
-leaderboard photos, and updates the leaderboard at
+Every night at midnight (Korean time), the grader takes the newest release of
+each track from each repository, trains the Track A recipes and scores
+everything on the leaderboard photos. When it has finished, usually in the
+morning, it updates the leaderboard at
 https://jdasam.github.io/mas1004-leaderboard/
 
 - The leaderboard photos are street scenes from YouTube walking and driving
@@ -185,8 +186,8 @@ https://jdasam.github.io/mas1004-leaderboard/
   leaderboard score comes out higher than it should.
 - The score is the share of photos placed in the right city, averaged over
   the five cities.
-- Only your newest release before 6:00 counts, so you get one score a day per
-  track.
+- Only your newest release before midnight counts, so you get one score a
+  day per track.
 - The title of your release appears next to your score. Use it to say what
   you changed.
 - If your release could not be scored, the reason is shown in red. Fix it and

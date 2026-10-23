@@ -78,8 +78,8 @@ Release my Track A recipe. The title is "starter recipe".
 ```
 
 Check: the agent ran `official.py --quick` first, and `track-a-1` is on your
-repository's Releases page. The next morning after 6:00 it is on the
-leaderboard.
+repository's Releases page. If you released it before midnight, it is on
+the leaderboard the next morning.
 
 ## Step 5. The mid-point check (30 October, 22:00)
 
@@ -153,7 +153,7 @@ entry for each change.
 ## Step 10. Release as you go
 
 Release whenever you have something better (Step 4). Only your newest release
-of each track before 6:00 counts each morning. Compare your validation score
+of each track before midnight counts each day. Compare your validation score
 with your leaderboard score; when they disagree, write down why you think
 they do.
 

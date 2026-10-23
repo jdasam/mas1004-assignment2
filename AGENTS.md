@@ -313,8 +313,9 @@ gh release create track-b-<n> submission/model.onnx submission/submission.json -
 
    Leave out `track_a/selection.csv` if there is none. `<n>` is one more than
    the last release of that track (`gh release list`).
-4. Tell the student that the leaderboard updates at 6:00 the next morning,
-   and that only the newest release of each track before 6:00 counts.
+4. Tell the student that the grader takes the newest release of each track
+   made before midnight, and that the leaderboard is updated when it has
+   finished, usually the next morning.
 
 ## The long report
 
